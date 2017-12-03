@@ -31,7 +31,7 @@ class WalterBuilder {
     })
 
     let mongooseSchema = _.get(this.options.model, 'schema.obj')
-    if (_.isNil(mongooseSchema)) throw new Error('A valid mongoose model is required in validator-builder.')
+    if (_.isNil(mongooseSchema)) throw new Error('A valid mongoose model is required in walter-builder.')
 
     let mapSchema = this.crawl(mongooseSchema)
     this.validationSchema = this.translate(mapSchema)

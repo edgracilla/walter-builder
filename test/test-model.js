@@ -17,6 +17,7 @@ module.exports = () => {
         minlength: 10,
         maxlength: 50,
         required: true,
+        unique: true,
         index: true,
         trim: true
       },

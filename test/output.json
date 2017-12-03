@@ -12,6 +12,10 @@
     "isEmail": {
       "msg": "Value for field 'email' must be a valid email address"
     },
+    "unique": {
+      "options": ["TestModel", "email"],
+      "msg": "Expecting unique value in 'email' field"
+    },
     "required": {
       "msg": "Value for field 'email' is required"
     },
@@ -55,9 +59,7 @@
   "arrObj.*.status": {
     "optional": true,
     "matches": {
-      "options": [
-        "^(pending|scheduled|accomplished)$"
-      ],
+      "options": ["^(pending|scheduled|accomplished)$"],
       "msg": "Can't find match value on enum field 'arrObj.*.status'. Expecting 'pending, scheduled, accomplished'"
     }
   },
