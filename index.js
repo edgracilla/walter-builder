@@ -114,7 +114,7 @@ class WalterBuilder {
       } else if (_.isPlainObject(field)) {
         entry = this.crawl(field, absPath)
       } else if (_.isObject(field)) {
-        entry = this.crawl(field.obj, path)
+        entry = this.crawl(field.obj, absPath || path)
       }
     }
 

@@ -83,6 +83,20 @@ module.exports = () => {
         }
       }, {_id: false}),
 
+      schemaObjArr: [new Schema({
+        title: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        content: {
+          type: String,
+          required: true,
+          maxlength: 10,
+          trim: true
+        }
+      }, {_id: false})],
+
       noValidatoin1: {
         type: Boolean,
         default: false
