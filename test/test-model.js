@@ -9,8 +9,7 @@ module.exports = () => {
     let schema = new Schema({
       _id: {
         type: String,
-        required: true,
-        trim: true
+        required: true
       },
       email: {
         type: String,
@@ -18,25 +17,23 @@ module.exports = () => {
         maxlength: 50,
         required: true,
         unique: true,
-        index: true,
-        trim: true
+        index: true
       },
       enums: {
         type: String,
         enum: ['jane', 'jean', 'jhon'],
-        default: 'jhon'
+        required: true
       },
 
       ref: {
         type: String,
         ref: `Demo1`,
-        required: true,
-        trim: true
+        required: true
       },
       arrRef: [{
         type: String,
         ref: `Demo2`,
-        trim: true
+        required: true
       }],
 
       arr: [{
@@ -56,60 +53,102 @@ module.exports = () => {
       arrObj: [{
         foo: {
           type: String,
-          ref: `Foo`,
-          trim: true
+          required: true
         },
-        status: {
+        bar: {
           type: String,
-          enum: ['pending', 'scheduled', 'accomplished'],
-          default: 'pending'
+          required: true
         }
       }],
-
-      arrDeep: [{
+      arrArr: [[{
+        type: String,
+        required: true
+      }]],
+      arrArrObj: [[{
+        foo: {
+          type: String,
+          required: true
+        }
+      }]],
+      arrObjArr: [{
         foo: [{
           type: String,
-          ref: `Foo`,
-          trim: true
+          required: true
         }]
       }],
-
-      arrObjDeep: [{
+      arrObjArrObj: [{
         foo: [{
           bar: {
             type: String,
-            required: true,
-            trim: true
+            required: true
+          }
+        }],
+        moo: [{
+          nar: {
+            type: String,
+            required: true
           }
         }]
       }],
-
+      arrObjArrObjObj: [{
+        foo: [{
+          bar: {
+            beer: {
+              type: String,
+            required: true
+            }
+          }
+        }],
+        fooo: [{
+          barr: {
+            beerr: {
+              type: String,
+              required: true
+            }
+          }
+        }]
+      }],
       schemaObj: new Schema({
-        title: {
+        foo: {
           type: String,
-          required: true,
-          trim: true
+          required: true
         },
-        content: {
+        bar: {
           type: String,
-          required: true,
-          maxlength: 10,
-          trim: true
+          required: true
         }
       }, {_id: false}),
-
       schemaObjArr: [new Schema({
-        title: {
+        foo: {
           type: String,
-          required: true,
-          trim: true
+          required: true
         },
-        content: {
+        bar: {
           type: String,
-          required: true,
-          maxlength: 10,
-          trim: true
+          required: true
         }
+      }, {_id: false})],
+      schemaObjArrObjArr: [new Schema({
+        foo: [{
+          type: String,
+          required: true
+        }],
+        bar: [{
+          type: String,
+          required: true
+        }]
+      }, {_id: false})],
+      schemaObjArrSchemaObj: [new Schema({
+        foo: new Schema({
+          foo: {
+            type: String,
+            required: true,
+          },
+          bar: {
+            type: String,
+            required: true
+          }
+        }, {_id: false})
       }, {_id: false})]
     })
 
