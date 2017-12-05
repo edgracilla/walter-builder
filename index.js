@@ -12,8 +12,8 @@ const ERR_MSG = {
   matches: "Can't find match value on enum field '%1$s'. Expecting '%2$s'",
   required: "Value for field '%1$s' is required",
   isLength: "Value for field '%1$s' must have a minimum length of %2$s and maximum length of %3$s characters",
-  minlength: "Field '%1$s' must be atleast in %2$s character(s).",
-  maxlength: "Field '%1$s' must not exceed in %2$s character(s).",
+  minlength: "Value for field '%1$s' must be atleast in %2$s character(s).",
+  maxlength: "Value for field '%1$s' must not exceed in %2$s character(s).",
 }
 
 class WalterBuilder {

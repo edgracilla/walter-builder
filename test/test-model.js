@@ -26,6 +26,7 @@ module.exports = () => {
         enum: ['jane', 'jean', 'jhon'],
         default: 'jhon'
       },
+
       ref: {
         type: String,
         ref: `Demo1`,
@@ -38,6 +39,20 @@ module.exports = () => {
         trim: true
       }],
 
+      arr: [{
+        type: String,
+        required: true
+      }],
+      obj: {
+        foo: {
+          type: String,
+          required: true
+        },
+        bar: {
+          type: String,
+          required: true
+        },
+      },
       arrObj: [{
         foo: {
           type: String,
@@ -95,23 +110,7 @@ module.exports = () => {
           maxlength: 10,
           trim: true
         }
-      }, {_id: false})],
-
-      noValidatoin1: {
-        type: Boolean,
-        default: false
-      },
-      noValidatoin2: {
-        type: String,
-        trim: true
-      },
-      noValidatoin3: {
-        type: Number,
-        default: 0
-      },
-      noValidatoin4: {
-        type: Date
-      },
+      }, {_id: false})]
     })
 
     mongoose.model(`TestModel`, schema, 'testmodel')
