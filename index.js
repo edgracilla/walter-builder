@@ -19,9 +19,9 @@ const ERR_MSG = {
 class WalterBuilder {
   constructor (options) {
     this._mix = null
-    this._omit = null
+    this._omit = []
     this._alloc = null
-    this._fields = null
+    this._fields = []
 
     this.options = options || {}
 
@@ -163,17 +163,19 @@ class WalterBuilder {
   }
 
   select (fields) {
-    this._fields = fields
+    fields = Array.isArray(fields) ? fields : _.isString(fields) ? [fields] : []
+    this._fields = this._fields.concat(fields)
     return this
   }
 
   pickByLoc (options) {
-    this._mix = options
+    this._mix = _.isPlainObject(options) ? options : {}
     return this
   }
 
   exclude (path) {
-    this._omit = path
+    path = Array.isArray(path) ? path : _.isString(path) ? [path] : []
+    this._omit = this._omit.concat(path)
     return this
   }
 
@@ -181,7 +183,8 @@ class WalterBuilder {
     let schema = _.clone(this.validationSchema)
     let pickByLoc = {}
 
-    if (!_.isNil(this._omit)) {
+    if (!_.isEmpty(this._omit)) {
+      this._omit = _.uniq(this._omit)
       schema = _.omit(schema, this._omit)
     }
 
@@ -198,14 +201,15 @@ class WalterBuilder {
 
       this._mix = null
 
-      if (_.isNil(this._fields) && _.isNil(this._alloc)) {
+      if (_.isEmpty(this._fields) && _.isNil(this._alloc)) {
         return pickByLoc
       }
     }
 
     if (!_.isEmpty(this._fields) && Array.isArray(this._fields)) {
+      this._fields = _.uniq(this._fields)
       schema = _.pick(schema, this._fields)
-      this._fields = null
+      this._fields = []
     }
 
     if (ALLOCATIONS.includes(this._alloc)) {
