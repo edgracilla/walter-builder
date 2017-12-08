@@ -40,6 +40,8 @@ class WalterBuilder {
   crawl (schema, parent = '') {
     let map = {}
     
+    if (_.isNil(schema)) return {}
+    
     Object.keys(schema).forEach(path => {
       map[path] = this.inspect(path, schema[path], parent ? `${parent}.${path}` : path)
       if (_.isNil(map[path])) delete map[path]
@@ -49,6 +51,8 @@ class WalterBuilder {
   }
 
   inspect (path, field, absPath = '') {
+    if (_.isNil(field)) return null
+
     let hasType = !_.isNil(field.type) && _.isFunction(field.type)
     let entry = {}
 
