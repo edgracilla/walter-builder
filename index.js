@@ -289,7 +289,6 @@ class WalterBuilder {
   addRules (rules) {
     if (Array.isArray(rules)) {
       rules.forEach(rule => {
-        console.log(rule)
         if (Array.isArray(rule) && rule.length > 1) {
           this.addRule(...rule)
         }
