@@ -9,16 +9,16 @@ module.exports = () => {
     let schema = new Schema({
       _id: {
         type: String,
-        required: true
+        // required: true
       },
-      // email: {
-      //   type: String,
-      //   minlength: 10,
-      //   maxlength: 50,
-      //   required: true,
-      //   unique: true,
-      //   index: true
-      // },
+      email: {
+        type: String,
+        // minlength: 10,
+        // maxlength: 50,
+        // required: true,
+        // unique: true,
+        index: true
+      },
       // enums: {
       //   type: String,
       //   enum: ['jane', 'jean', 'jhon'],
@@ -108,36 +108,36 @@ module.exports = () => {
       //     }
       //   }]
       // }],
-      schemaObj: new Schema({
-        foo: {
-          type: String,
-          required: true
-        },
-        bar: {
-          type: String,
-          required: true
-        }
-      }, {_id: false}),
-      schemaObjArr: [new Schema({
-        foo: {
-          type: String,
-          required: true
-        },
-        bar: {
-          type: String,
-          required: true
-        }
-      }, {_id: false})],
-      schemaObjArrObjArr: [new Schema({
-        foo: [{
-          type: String,
-          required: true
-        }],
-        bar: [{
-          type: String,
-          required: true
-        }]
-      }, {_id: false})],
+      // schemaObj: new Schema({
+      //   foo: {
+      //     type: String,
+      //     required: true
+      //   },
+      //   bar: {
+      //     type: String,
+      //     required: true
+      //   }
+      // }, {_id: false}),
+      // schemaObjArr: [new Schema({
+      //   foo: {
+      //     type: String,
+      //     required: true
+      //   },
+      //   bar: {
+      //     type: String,
+      //     required: true
+      //   }
+      // }, {_id: false})],
+      // schemaObjArrObjArr: [new Schema({
+      //   foo: [{
+      //     type: String,
+      //     required: true
+      //   }],
+      //   bar: [{
+      //     type: String,
+      //     required: true
+      //   }]
+      // }, {_id: false})],
       schemaObjArrSchemaObj: [new Schema({
         foo: new Schema({
           foo: {

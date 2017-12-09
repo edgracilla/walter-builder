@@ -19,9 +19,11 @@ const ERR_MSG = {
 class WalterBuilder {
   constructor (options) {
     this._mix = null
-    this._omit = []
     this._alloc = null
+
+    this._omit = []
     this._fields = []
+    this._addedRules = {}
 
     this.options = options || {}
 
@@ -58,58 +60,86 @@ class WalterBuilder {
 
     if (hasType) {
       if (path === 'email') {
-        entry.isEmail = {
-          msg: vsprintf(ERR_MSG.isEmail, [absPath])
-        }
+        // entry.isEmail = {
+        //   msg: vsprintf(ERR_MSG.isEmail, [absPath])
+        // }
+        Object.assign(entry, this.mapRule(absPath, 'isEmail'))
       }
 
       if (this.options.uuid && (path === '_id' || !_.isNil(field.ref))) {
-        entry.isUUID = {
-          options: [this.options.uuidVersion] ,
-          msg: vsprintf(ERR_MSG.isUUID, [absPath, this.options.uuidVersion])
-        }
+        // entry.isUUID = {
+        //   options: [this.options.uuidVersion] ,
+        //   msg: vsprintf(ERR_MSG.isUUID, [absPath, this.options.uuidVersion])
+        // }
+        Object.assign(entry, this.mapRule(absPath, 'isUUID', {
+          options: [this.options.uuidVersion]
+        }))
       }
 
       if (!_.isNil(field.unique) && field.unique) {
-        entry.unique = {
-          options: [this.options.model.modelName, path],
-          msg: vsprintf(ERR_MSG.unique, [absPath])
-        }
+        // entry.unique = {
+        //   options: [this.options.model.modelName, path],
+        //   msg: vsprintf(ERR_MSG.unique, [absPath])
+        // }
+        Object.assign(entry, this.mapRule(absPath, 'unique', {
+          options: [this.options.model.modelName, path]
+        }))
       }
       
       if (!_.isNil(field.required) && field.required) {
-        entry.required = {
-          msg: vsprintf(ERR_MSG.required, [absPath])
-        }
+        // entry.required = {
+        //   msg: vsprintf(ERR_MSG.required, [absPath])
+        // }
+        Object.assign(entry, this.mapRule(absPath, 'required'))
       } else {
         entry.optional = true
       }
 
       if ((!_.isNil(field.minlength) && field.minlength > 0) && (!_.isNil(field.maxlength) && field.maxlength > 0)) {
-        entry.isLength = {
+        // entry.isLength = {
+        //   options: [{min: field.minlength, max: field.maxlength}],
+        //   msg: vsprintf(ERR_MSG.isLength, [absPath, field.minlength, field.maxlength])
+        // }
+        Object.assign(entry, this.mapRule(absPath, 'isLength', {
           options: [{min: field.minlength, max: field.maxlength}],
-          msg: vsprintf(ERR_MSG.isLength, [absPath, field.minlength, field.maxlength])
-        }
+          minlength: field.minlength,
+          minlength: field.minlength,
+          tag: 'isLength'
+        }))
       } else {
         if (!_.isNil(field.minlength) && field.minlength > 0) {
-          entry.isLength = {
+          // entry.isLength = {
+          //   options: [{min: field.minlength}],
+          //   msg: vsprintf(ERR_MSG.minlength, [absPath, field.minlength])
+          // }
+          Object.assign(entry, this.mapRule(absPath, 'isLength', {
             options: [{min: field.minlength}],
-            msg: vsprintf(ERR_MSG.minlength, [absPath, field.minlength])
-          }
+            minlength: field.minlength,
+            tag: 'minlength'
+          }))
         }
         if (!_.isNil(field.maxlength) && field.maxlength > 0) {
-          entry.isLength = {
+          // entry.isLength = {
+          //   options: [{max: field.maxlength}],
+          //   msg: vsprintf(ERR_MSG.maxlength, [absPath, field.maxlength])
+          // }
+          Object.assign(entry, this.mapRule(absPath, 'isLength', {
             options: [{max: field.maxlength}],
-            msg: vsprintf(ERR_MSG.maxlength, [absPath, field.maxlength])
-          }
+            maxlength: field.maxlength,
+            tag: 'maxlength'
+          }))
         }
       }
 
       if (!_.isNil(field.enum) && Array.isArray(field.enum) && field.enum.length) {
-        entry.matches = {
+        // entry.matches = {
+        //   options: [`^(${field.enum.join('|')})$`],
+        //   msg: vsprintf(ERR_MSG.matches, [absPath, field.enum.join(', ')])
+        // }
+        Object.assign(entry, this.mapRule(absPath, 'matches', {
           options: [`^(${field.enum.join('|')})$`],
-          msg: vsprintf(ERR_MSG.matches, [absPath, field.enum.join(', ')])
-        }
+          enums: field.enum.join(', ')
+        }))
       }
     } else {
       if (Array.isArray(field)) {
@@ -123,6 +153,60 @@ class WalterBuilder {
     }
 
     return (hasType && !_.isEmpty(entry) ? entry : (Object.keys(entry).length ? entry : undefined))
+  }
+
+  mapRule (absPath, validationName, misc = {}) {
+    let entry = {}
+
+    switch (misc.tag || validationName) {
+      case 'required':
+        entry.required = {
+          msg: vsprintf(ERR_MSG.required, [absPath])
+        }; break
+
+      case 'unique':
+        entry.unique = {
+          options: misc.options || [],
+          msg: vsprintf(ERR_MSG.unique, [absPath])
+        }; break
+      
+      case 'isEmail':
+        entry.isEmail = {
+          msg: vsprintf(ERR_MSG.isEmail, [absPath])
+        }; break
+      
+      case 'isUUID':
+        entry.isUUID = {
+          options: misc.options || [],
+          msg: vsprintf(ERR_MSG.isUUID, [absPath, misc.options[0] || this.options.uuidVersion])
+        }; break
+      
+      case 'minlength':
+        entry.isLength = {
+          options: misc.options || [],
+          msg: vsprintf(ERR_MSG[misc.tag], [absPath, misc.minlength])
+        }; break
+
+      case 'maxlength':
+        entry.isLength = {
+          options: misc.options || [],
+          msg: vsprintf(ERR_MSG[misc.tag], [absPath, misc.maxlength])
+        }; break
+      
+      case 'isLength':
+        entry.isLength = {
+          options: misc.options || [],
+          msg: vsprintf(ERR_MSG.isLength, [absPath, misc.minlength, misc.maxlength])
+        }; break
+
+      case 'matches':
+        entry.matches = {
+          options: misc.options || [],
+          msg: vsprintf(ERR_MSG.matches, [absPath, misc.enums])
+        }
+    }
+
+    return entry
   }
 
   translate (mapSchema) {
@@ -179,6 +263,25 @@ class WalterBuilder {
     return this
   }
 
+  addRule (path, rule, options, misc) {
+    if (_.isString(path)) {
+      
+      let value = {
+        rule: rule,
+        misc: misc,
+        options: Array.isArray(options) ? options : []
+      }
+
+      if (_.isNil(this._addedRules[path])) {
+        this._addedRules[path] = [value]
+      } else {
+        this._addedRules[path].push(value)
+      }
+    }
+
+    return this
+  }
+
   build () {
     let schema = _.clone(this.validationSchema)
     let pickByLoc = {}
@@ -227,16 +330,35 @@ class WalterBuilder {
     }
 
     if (ALLOCATIONS.includes(this._alloc)) {
-      Object.keys(schema).forEach(field => {
-        if (!_.isEmpty(schema[field])) {
-          schema[field].in = this._alloc
+      Object.keys(schema).forEach(path => {
+        if (!_.isEmpty(schema[path])) {
+          schema[path].in = this._alloc
         }
       })
 
       this._alloc = null
     }
 
-    return Object.assign(schema, pickByLoc)
+    schema = Object.assign(schema, pickByLoc)
+
+    if (!_.isEmpty(this._addedRules)) {
+      Object.keys(this._addedRules).forEach(rulePath => {
+        Object.keys(schema).forEach(path => {
+          if (rulePath === path) {
+            this._addedRules[rulePath].forEach(entry => {
+              if (_.isNil(schema[path][entry.rule])) {
+                Object.assign(schema[path], this.mapRule(path, entry.rule, {
+                  options: entry.options,
+                  misc: entry.misc
+                }))
+              }
+            })
+          }
+        })
+      })
+    }
+
+    return schema
   }
 }
 
