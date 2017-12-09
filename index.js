@@ -176,6 +176,10 @@ class WalterBuilder {
         }; break
       
       case 'isUUID':
+        if (Array.isArray(misc.options)) {
+          misc.options[0] = misc.options[0] || this.options.uuidVersion
+        }
+        
         entry.isUUID = {
           options: misc.options || [],
           msg: vsprintf(ERR_MSG.isUUID, [absPath, misc.options[0] || this.options.uuidVersion])
@@ -277,6 +281,19 @@ class WalterBuilder {
       } else {
         this._addedRules[path].push(value)
       }
+    }
+
+    return this
+  }
+
+  addRules (rules) {
+    if (Array.isArray(rules)) {
+      rules.forEach(rule => {
+        console.log(rule)
+        if (Array.isArray(rule) && rule.length > 1) {
+          this.addRule(...rule)
+        }
+      })
     }
 
     return this

@@ -11,14 +11,14 @@ module.exports = () => {
         type: String,
         // required: true
       },
-      email: {
-        type: String,
+      // email: {
+      //   type: String,
         // minlength: 10,
         // maxlength: 50,
         // required: true,
         // unique: true,
-        index: true
-      },
+      //   index: true
+      // },
       // enums: {
       //   type: String,
       //   enum: ['jane', 'jean', 'jhon'],
@@ -118,16 +118,16 @@ module.exports = () => {
       //     required: true
       //   }
       // }, {_id: false}),
-      // schemaObjArr: [new Schema({
-      //   foo: {
-      //     type: String,
-      //     required: true
-      //   },
-      //   bar: {
-      //     type: String,
-      //     required: true
-      //   }
-      // }, {_id: false})],
+      schemaObjArr: [new Schema({
+        foo: {
+          type: String,
+          required: true
+        },
+        bar: {
+          type: String,
+          required: true
+        }
+      }, {_id: false})],
       // schemaObjArrObjArr: [new Schema({
       //   foo: [{
       //     type: String,
