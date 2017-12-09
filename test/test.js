@@ -12,8 +12,8 @@ let schema = builder
   // .pickByLoc({query: ['_id'], params: ['email']})
   // .select(['_id', 'enums', 'ref'])
   // .location('body')
-  // .exclude('enums')
+  .exclude(['schemaObjArrObjArr.*.bar'])
   .build()
 
-// console.log('\n--schema', schema)
-console.log('\nOUTPUT:', JSON.stringify(schema))
+console.log('\n--schema', schema)
+// console.log('\nOUTPUT:', JSON.stringify(schema))

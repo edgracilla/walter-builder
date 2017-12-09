@@ -184,7 +184,21 @@ class WalterBuilder {
     let pickByLoc = {}
 
     if (!_.isEmpty(this._omit)) {
+      let paths = []
       this._omit = _.uniq(this._omit)
+
+      Object.keys(schema).forEach(path => {
+        paths.push(path)
+      })
+
+      this._omit.forEach(omitKey => {
+        paths.forEach(path => {
+          if ((new RegExp(`^${omitKey.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\.`)).test(path)) {
+            this._omit.push(path)
+          }
+        })
+      })
+
       schema = _.omit(schema, this._omit)
     }
 
