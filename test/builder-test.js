@@ -26,6 +26,12 @@ let schema = builder
   // .addRule('email', 'unique', ['aa', 'bb'])
   // .addRule('schemaObjArrSchemaObj.*.foo.bar', 'unique', ['aa', 'bb'])
   // .unstrict(['arrObj.*', 'schemaObjArr.*'])
+
+  // TODO: add .new() function to completely create new validation schema, this can be helpful with addRule for custom schema creation ignoring mongoose db
+  // TODO: pickByLoc 'arrObj.*' instead of arrObj.*.foo
+  // TODO: pickByLoc support string object value for string || array of string
+  .pickByLoc({query: ['arrObj.*']}) // !!
+
   .select(['_id', 'arrObj.*'])
   .build()
 
