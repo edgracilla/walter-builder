@@ -50,16 +50,16 @@ module.exports = () => {
       //     required: true
       //   },
       // },
-      // arrObj: [{
-      //   foo: {
-      //     type: String,
-      //     required: true
-      //   },
-      //   bar: {
-      //     type: String,
-      //     required: true
-      //   }
-      // }],
+      arrObj: [{
+        foo: {
+          type: String,
+          required: true
+        },
+        bar: {
+          type: String,
+          required: true
+        }
+      }],
       // arrArr: [[{
       //   type: String,
       //   required: true
@@ -138,18 +138,18 @@ module.exports = () => {
       //     required: true
       //   }]
       // }, {_id: false})],
-      schemaObjArrSchemaObj: [new Schema({
-        foo: new Schema({
-          foo: {
-            type: String,
-            required: true,
-          },
-          bar: {
-            type: String,
-            required: true
-          }
-        }, {_id: false})
-      }, {_id: false})]
+      // schemaObjArrSchemaObj: [new Schema({
+      //   foo: new Schema({
+      //     foo: {
+      //       type: String,
+      //       required: true,
+      //     },
+      //     bar: {
+      //       type: String,
+      //       required: true
+      //     }
+      //   }, {_id: false})
+      // }, {_id: false})]
     })
 
     mongoose.model(`TestModel`, schema, 'testmodel')

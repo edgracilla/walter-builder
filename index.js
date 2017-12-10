@@ -23,6 +23,7 @@ class WalterBuilder {
 
     this._omit = []
     this._fields = []
+    this._unstricts = []
     this._addedRules = {}
 
     this.options = options || {}
@@ -243,6 +244,10 @@ class WalterBuilder {
     return validations
   }
 
+  escapeRx (str) {
+    return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+  }
+
   // -- user usable functions
 
   location (alloc) {
@@ -298,6 +303,20 @@ class WalterBuilder {
     return this
   }
 
+  unstrict (arrPath) {
+    if (_.isString(arrPath)) {
+      this._unstricts.push(arrPath)
+    } else if (Array.isArray(arrPath)) {
+      arrPath.forEach(path => {
+        if (_.isString(path)) {
+          this._unstricts.push(path)
+        }
+      })
+    }
+
+    return this
+  }
+
   build () {
     let schema = _.clone(this.validationSchema)
     let pickByLoc = {}
@@ -312,7 +331,7 @@ class WalterBuilder {
 
       this._omit.forEach(omitKey => {
         paths.forEach(path => {
-          if ((new RegExp(`^${omitKey.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\.`)).test(path)) {
+          if ((new RegExp(`^${this.escapeRx(omitKey)}\\.`)).test(path)) {
             this._omit.push(path)
           }
         })
@@ -373,6 +392,27 @@ class WalterBuilder {
           }
         })
       })
+    }
+
+    if (!_.isEmpty(this._unstricts)) {
+      let paths = []
+
+      Object.keys(schema).forEach(path => {
+        paths.push(path)
+      })
+
+      this._unstricts.forEach(arrPath => {
+        for (let i = 0; i < paths.length; i++) {
+          if ((new RegExp(`^${this.escapeRx(arrPath)}\\.`)).test(paths[i])) {
+            let entry = {}
+            entry[arrPath] = {optional: true}
+            Object.assign(schema, entry)
+            break
+          }
+        }
+      })
+
+      this._unstricts = []
     }
 
     return schema

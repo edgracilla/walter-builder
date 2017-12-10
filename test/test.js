@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 
 let options = {
   uuid: true,
+  arrStrict: false,
   model: mongoose.model('TestModel'),
 }
 
@@ -20,10 +21,11 @@ let schema = builder
   // .pickByLoc({query: ['_id'], params: ['email']})
   // .select(['_id', 'enums', 'ref'])
   // .location('body')
-  .exclude(['schemaObjArrSchemaObj'])
-  .addRules(extraRules)
+  // .addRules(extraRules)
+  // .exclude(['schemaObjArrSchemaObj.*.foo'])
   // .addRule('email', 'unique', ['aa', 'bb'])
   // .addRule('schemaObjArrSchemaObj.*.foo.bar', 'unique', ['aa', 'bb'])
+  .unstrict(['arrObj.*', 'schemaObjArr.*'])
   .build()
 
 console.log('\n--schema', schema)
