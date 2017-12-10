@@ -337,6 +337,8 @@ class WalterBuilder {
     let schema = _.clone(this.validationSchema)
     let pickByLoc = {}
 
+    // -- exclue()
+
     if (!_.isEmpty(this._omit)) {
       let paths = []
       this._omit = _.uniq(this._omit)
@@ -357,6 +359,8 @@ class WalterBuilder {
       this._omit = []
     }
 
+    // -- pickByLoc()
+
     if (!_.isEmpty(this._mix) && _.isPlainObject(this._mix)) {
       Object.keys(this._mix).forEach(alloc => {
         if (ALLOCATIONS.includes(alloc) && Array.isArray(this._mix[alloc])) {
@@ -375,11 +379,36 @@ class WalterBuilder {
       }
     }
 
+    // -- select()
+
     if (!_.isEmpty(this._fields) && Array.isArray(this._fields)) {
+      let paths = []
+      let pureArr = []
+
+      Object.keys(schema).forEach(path => {
+        paths.push(path)
+      })
+
+      this._fields.forEach(path => {
+        if (/^[\w].*\.\*$/.test(path)) {
+          pureArr.push(path)
+        }
+      })
+
+      pureArr.forEach(arrPath => {
+        paths.forEach(path => {
+          if ((new RegExp(`^${arrPath.replace(/[*.]/g, '\\$&')}\\.`)).test(path)) {
+            this._fields.push(path)
+          }
+        })
+      })
+
       this._fields = _.uniq(this._fields)
       schema = _.pick(schema, this._fields)
       this._fields = []
     }
+
+    // -- location()
 
     if (ALLOCATIONS.includes(this._alloc)) {
       Object.keys(schema).forEach(path => {
@@ -392,6 +421,8 @@ class WalterBuilder {
     }
 
     schema = Object.assign(schema, pickByLoc)
+
+    // -- addRule() / addRules()
 
     if (!_.isEmpty(this._addedRules)) {
       Object.keys(this._addedRules).forEach(rulePath => {
@@ -409,6 +440,8 @@ class WalterBuilder {
         })
       })
     }
+
+    // -- unstrict()
 
     if (!_.isEmpty(this._unstricts)) {
       let paths = []

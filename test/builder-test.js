@@ -25,7 +25,8 @@ let schema = builder
   // .exclude(['schemaObjArrSchemaObj.*.foo'])
   // .addRule('email', 'unique', ['aa', 'bb'])
   // .addRule('schemaObjArrSchemaObj.*.foo.bar', 'unique', ['aa', 'bb'])
-  .unstrict(['arrObj.*', 'schemaObjArr.*'])
+  // .unstrict(['arrObj.*', 'schemaObjArr.*'])
+  .select(['_id', 'arrObj.*'])
   .build()
 
 console.log('\n--schema', schema)
