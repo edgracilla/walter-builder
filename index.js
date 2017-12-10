@@ -319,6 +319,7 @@ class WalterBuilder {
       })
 
       schema = _.omit(schema, this._omit)
+      this._omit = []
     }
 
     if (!_.isEmpty(this._mix) && _.isPlainObject(this._mix)) {
