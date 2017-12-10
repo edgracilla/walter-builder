@@ -255,9 +255,17 @@ class WalterBuilder {
     return this
   }
 
-  select (fields) {
-    fields = Array.isArray(fields) ? fields : _.isString(fields) ? [fields] : []
-    this._fields = this._fields.concat(fields)
+  select (paths) {
+    if (_.isString(paths)) {
+      this._fields.push(paths)
+    } else if (Array.isArray(paths)) {
+      paths.forEach(path => {
+        if (_.isString(path)) {
+          this._fields.push(path)
+        }
+      })
+    }
+
     return this
   }
 
@@ -266,9 +274,17 @@ class WalterBuilder {
     return this
   }
 
-  exclude (path) {
-    path = Array.isArray(path) ? path : _.isString(path) ? [path] : []
-    this._omit = this._omit.concat(path)
+  exclude (paths) {
+    if (_.isString(paths)) {
+      this._omit.push(paths)
+    } else if (Array.isArray(paths)) {
+      paths.forEach(path => {
+        if (_.isString(path)) {
+          this._omit.push(path)
+        }
+      })
+    }
+
     return this
   }
 
