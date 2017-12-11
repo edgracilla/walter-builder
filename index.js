@@ -432,17 +432,14 @@ class WalterBuilder {
     // -- addRule() / addRules()
 
     if (!_.isEmpty(this._addedRules)) {
-      Object.keys(this._addedRules).forEach(rulePath => {
-        Object.keys(schema).forEach(path => {
-          if (rulePath === path) {
-            this._addedRules[rulePath].forEach(entry => {
-              if (_.isNil(schema[path][entry.rule])) {
-                Object.assign(schema[path], this.mapRule(path, entry.rule, {
-                  options: entry.options,
-                  misc: entry.misc
-                }))
-              }
-            })
+      Object.keys(this._addedRules).forEach(path => {
+        this._addedRules[path].forEach(entry => {
+          if (_.isNil(schema[path])) schema[path] = {}
+          if (_.isNil(schema[path][entry.rule])) {
+            Object.assign(schema[path], this.mapRule(path, entry.rule, {
+              options: entry.options,
+              misc: entry.misc
+            }))
           }
         })
       })
