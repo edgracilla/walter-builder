@@ -20,6 +20,7 @@ class WalterBuilder {
   constructor (options) {
     this._mix = null
     this._alloc = null
+    this._fresh = false
 
     this._omit = []
     this._fields = []
@@ -333,10 +334,16 @@ class WalterBuilder {
     return this
   }
 
+  fresh () {
+    this._fresh = true
+    return this
+  }
+
   build () {
-    let schema = _.clone(this.validationSchema)
+    let schema = this._fresh ? {} : _.clone(this.validationSchema)
     let pickByLoc = {}
 
+    this._fresh = false
     // -- exclue()
 
     if (!_.isEmpty(this._omit)) {
