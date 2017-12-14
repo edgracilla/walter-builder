@@ -62,46 +62,28 @@ class WalterBuilder {
 
     if (hasType) {
       if (path === 'email') {
-        // entry.isEmail = {
-        //   msg: vsprintf(ERR_MSG.isEmail, [absPath])
-        // }
         Object.assign(entry, this.mapRule(absPath, 'isEmail'))
       }
 
       if (this.options.uuid && (path === '_id' || !_.isNil(field.ref))) {
-        // entry.isUUID = {
-        //   options: [this.options.uuidVersion] ,
-        //   msg: vsprintf(ERR_MSG.isUUID, [absPath, this.options.uuidVersion])
-        // }
         Object.assign(entry, this.mapRule(absPath, 'isUUID', {
           options: [this.options.uuidVersion]
         }))
       }
 
       if (!_.isNil(field.unique) && field.unique) {
-        // entry.unique = {
-        //   options: [this.options.model.modelName, path],
-        //   msg: vsprintf(ERR_MSG.unique, [absPath])
-        // }
         Object.assign(entry, this.mapRule(absPath, 'unique', {
           options: [this.options.model.modelName, path]
         }))
       }
       
       if (!_.isNil(field.required) && field.required) {
-        // entry.required = {
-        //   msg: vsprintf(ERR_MSG.required, [absPath])
-        // }
         Object.assign(entry, this.mapRule(absPath, 'required'))
       } else {
         entry.optional = true
       }
 
       if ((!_.isNil(field.minlength) && field.minlength > 0) && (!_.isNil(field.maxlength) && field.maxlength > 0)) {
-        // entry.isLength = {
-        //   options: [{min: field.minlength, max: field.maxlength}],
-        //   msg: vsprintf(ERR_MSG.isLength, [absPath, field.minlength, field.maxlength])
-        // }
         Object.assign(entry, this.mapRule(absPath, 'isLength', {
           options: [{min: field.minlength, max: field.maxlength}],
           minlength: field.minlength,
@@ -110,10 +92,6 @@ class WalterBuilder {
         }))
       } else {
         if (!_.isNil(field.minlength) && field.minlength > 0) {
-          // entry.isLength = {
-          //   options: [{min: field.minlength}],
-          //   msg: vsprintf(ERR_MSG.minlength, [absPath, field.minlength])
-          // }
           Object.assign(entry, this.mapRule(absPath, 'isLength', {
             options: [{min: field.minlength}],
             minlength: field.minlength,
@@ -121,10 +99,6 @@ class WalterBuilder {
           }))
         }
         if (!_.isNil(field.maxlength) && field.maxlength > 0) {
-          // entry.isLength = {
-          //   options: [{max: field.maxlength}],
-          //   msg: vsprintf(ERR_MSG.maxlength, [absPath, field.maxlength])
-          // }
           Object.assign(entry, this.mapRule(absPath, 'isLength', {
             options: [{max: field.maxlength}],
             maxlength: field.maxlength,
@@ -134,10 +108,6 @@ class WalterBuilder {
       }
 
       if (!_.isNil(field.enum) && Array.isArray(field.enum) && field.enum.length) {
-        // entry.matches = {
-        //   options: [`^(${field.enum.join('|')})$`],
-        //   msg: vsprintf(ERR_MSG.matches, [absPath, field.enum.join(', ')])
-        // }
         Object.assign(entry, this.mapRule(absPath, 'matches', {
           options: [`^(${field.enum.join('|')})$`],
           enums: field.enum.join(', ')
@@ -368,12 +338,24 @@ class WalterBuilder {
 
     // -- pickByLoc()
 
+    let paths = []
+
+    Object.keys(schema).forEach(path => {
+      paths.push(path)
+    })
+
     if (!_.isEmpty(this._mix) && _.isPlainObject(this._mix)) {
       Object.keys(this._mix).forEach(alloc => {
         if (ALLOCATIONS.includes(alloc) && Array.isArray(this._mix[alloc])) {
           this._mix[alloc].forEach(field => {
             if (!_.isEmpty(schema[field])) {
               pickByLoc[field] = Object.assign(_.clone(schema[field]), {in: alloc})
+            } else {
+              paths.forEach(path => {
+                if ((new RegExp(`^${field.replace(/[*.]/g, '\\$&')}\\.`)).test(path)) {
+                  pickByLoc[path] = Object.assign(_.clone(schema[path]), {in: alloc})
+                }
+              })
             }
           })
         }
@@ -389,12 +371,7 @@ class WalterBuilder {
     // -- select()
 
     if (!_.isEmpty(this._fields) && Array.isArray(this._fields)) {
-      let paths = []
       let pureArr = []
-
-      Object.keys(schema).forEach(path => {
-        paths.push(path)
-      })
 
       this._fields.forEach(path => {
         if (/^[\w].*\.\*$/.test(path)) {

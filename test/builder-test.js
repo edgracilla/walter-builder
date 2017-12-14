@@ -27,14 +27,12 @@ let schema = builder
   // .addRule('arrObj.*.bar', 'unique', ['aa', 'bb'])
   // .unstrict(['arrObj.*', 'schemaObjArr.*'])
 
-  // TODO: pickByLoc 'arrObj.*' instead of arrObj.*.foo
-  // TODO: pickByLoc support string object value for string || array of string
-  // .pickByLoc({query: ['arrObj.*']}) // !!
+  .pickByLoc({query: ['schemaObjArrSchemaObj']}) // !!
 
   // .select(['_id', 'arrObj.*'])
 
-  .fresh()
-  .addRules(extraRules)
+  // .fresh()
+  // .addRules(extraRules)
   .build()
 
 console.log('\n--schema', schema)
