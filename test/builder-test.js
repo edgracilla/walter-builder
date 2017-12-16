@@ -10,13 +10,18 @@ let options = {
   model: mongoose.model('TestModel'),
   templates: {
     unique: `Expecting unique value in '%1$s' field. %2$s, %3$s`,
+    unique: `Expecting unique value in '%(path)s' field. %(model)s, %(field)s`,
   }
 }
 
 let extraRules = [
-  ['schemaObjArr.*.foo', 'isUUID', [4]],
-  ['schemaObjArr.*.foo', 'isEmail'],
-  ['schemaObjArr.*.bar', 'unique', ['aa', 'bb']]
+  // ['schemaObjArr.*.foo', 'isUUID', [4]],
+  // ['schemaObjArr.*.foo', 'isEmail'],
+  // ['schemaObjArr.*.for', 'unique', ['aa', 'bb']]
+  ['schemaObjArr.*.bar', 'unique', {
+    model: 'modelFoo',
+    field: 'fieldBar'
+  }]
 ]
   
 let builder = new Builder(options)
@@ -24,7 +29,7 @@ let schema = builder
   // .pickByLoc({query: ['_id'], params: ['email']})
   // .select(['_id', 'enums', 'ref'])
   // .location('body')
-  // .addRules(extraRules)
+  .addRules(extraRules)
   // .exclude(['schemaObjArrSchemaObj.*.foo'])
   // .addRule('email', 'unique', ['aa', 'bb'])
   // .addRule('arrObj.*.bar', 'unique', ['aa', 'bb'])
@@ -37,7 +42,7 @@ let schema = builder
   // .fresh()
   // .addRules(extraRules)
 
-  .select('email')
+  // .select('email')
   .build()
 
 console.log('\n--schema', schema)

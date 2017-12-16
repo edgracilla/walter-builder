@@ -9,16 +9,16 @@ module.exports = () => {
     let schema = new Schema({
       _id: {
         type: String,
-        // required: true
+        required: true
       },
-      email: {
-        type: String,
-        minlength: 10,
-        maxlength: 50,
-        required: true,
-        unique: true,
-        index: true
-      },
+      // email: {
+      //   type: String,
+      //   minlength: 10,
+      //   maxlength: 50,
+      //   required: true,
+      //   unique: true,
+      //   index: true
+      // },
       // enums: {
       //   type: String,
       //   enum: ['jane', 'jean', 'jhon'],
@@ -50,16 +50,16 @@ module.exports = () => {
       //     required: true
       //   },
       // },
-      arrObj: [{
-        foo: {
-          type: String,
-          required: true
-        },
-        bar: {
-          type: String,
-          required: true
-        }
-      }],
+      // arrObj: [{
+      //   foo: {
+      //     type: String,
+      //     required: true
+      //   },
+      //   bar: {
+      //     type: String,
+      //     required: true
+      //   }
+      // }],
       // arrArr: [[{
       //   type: String,
       //   required: true
@@ -138,18 +138,18 @@ module.exports = () => {
       //     required: true
       //   }]
       // }, {_id: false})],
-      schemaObjArrSchemaObj: [new Schema({
-        foo: new Schema({
-          foo: {
-            type: String,
-            required: true,
-          },
-          bar: {
-            type: String,
-            required: true
-          }
-        }, {_id: false})
-      }, {_id: false})]
+      // schemaObjArrSchemaObj: [new Schema({
+      //   foo: new Schema({
+      //     foo: {
+      //       type: String,
+      //       required: true,
+      //     },
+      //     bar: {
+      //       type: String,
+      //       required: true
+      //     }
+      //   }, {_id: false})
+      // }, {_id: false})]
     })
 
     mongoose.model(`TestModel`, schema, 'testmodel')

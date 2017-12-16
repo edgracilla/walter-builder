@@ -1,8 +1,9 @@
 'use strict'
 
 const _ = require('lodash')
-const defaultTemplate = require('./templates')
+const sprintf = require('sprintf-js').sprintf
 const vsprintf = require('sprintf-js').vsprintf
+const defaultTemplate = require('./templates')
 
 const ALLOCATIONS = ['params', 'query', 'body', 'headers', 'cookies']
 
@@ -84,23 +85,22 @@ class WalterBuilder {
 
       if ((!_.isNil(field.minlength) && field.minlength > 0) && (!_.isNil(field.maxlength) && field.maxlength > 0)) {
         Object.assign(entry, this.mapRule(absPath, 'isLength', {
-          options: [{min: field.minlength, max: field.maxlength}],
-          minlength: field.minlength,
-          minlength: field.minlength,
-          tag: 'isLength'
+          options: [
+            {min: field.minlength, max: field.maxlength},
+            field.minlength,
+            field.maxlength
+          ]
         }))
       } else {
         if (!_.isNil(field.minlength) && field.minlength > 0) {
           Object.assign(entry, this.mapRule(absPath, 'isLength', {
-            options: [{min: field.minlength}],
-            minlength: field.minlength,
+            options: [{min: field.minlength}, field.minlength],
             tag: 'minlength'
           }))
         }
         if (!_.isNil(field.maxlength) && field.maxlength > 0) {
           Object.assign(entry, this.mapRule(absPath, 'isLength', {
-            options: [{max: field.maxlength}],
-            maxlength: field.maxlength,
+            options: [{max: field.maxlength}, field.maxlength],
             tag: 'maxlength'
           }))
         }
@@ -108,8 +108,7 @@ class WalterBuilder {
 
       if (!_.isNil(field.enum) && Array.isArray(field.enum) && field.enum.length) {
         Object.assign(entry, this.mapRule(absPath, 'matches', {
-          options: [`^(${field.enum.join('|')})$`],
-          enums: field.enum.join(', ')
+          options: [`^(${field.enum.join('|')})$`, field.enum.join(', ')]
         }))
       }
     } else {
@@ -127,6 +126,26 @@ class WalterBuilder {
   }
 
   mapRule (absPath, validationName, misc = {}) {
+    let entry = {}
+    let key = misc.tag || validationName
+    
+    entry[key] = {}
+    
+    if (_.isNil(this.options.templates[key])) {
+      this.options.templates[key]= `No validation message assigned for rule '${key}'`
+    }
+
+    if (_.isPlainObject(misc.options)) {
+      misc.options.path = absPath
+      entry[key].msg = sprintf(this.options.templates[key], misc.options)
+    } else if (Array.isArray(misc.options) || _.isNil(misc.options)) {
+      entry[key].msg = vsprintf(this.options.templates[key], [absPath].concat(misc.options).filter(Boolean))
+    }
+
+    return entry
+  }
+
+  mapRuleX (absPath, validationName, misc = {}) {
     let entry = {}
 
     switch (misc.tag || validationName) {
@@ -187,7 +206,7 @@ class WalterBuilder {
   translate (mapSchema) {
     let validations = {}
     let self = this
-
+    
     function __remap (key, schemaEntry) {
       let validation = {}
 
@@ -265,7 +284,7 @@ class WalterBuilder {
       let value = {
         rule: rule,
         misc: misc,
-        options: Array.isArray(options) ? options : []
+        options: Array.isArray(options) || _.isPlainObject(options) ? options : []
       }
 
       if (_.isNil(this._addedRules[path])) {
