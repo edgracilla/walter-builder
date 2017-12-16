@@ -1,20 +1,10 @@
 'use strict'
 
 const _ = require('lodash')
+const defaultTemplate = require('./templates')
 const vsprintf = require('sprintf-js').vsprintf
 
 const ALLOCATIONS = ['params', 'query', 'body', 'headers', 'cookies']
-
-const ERR_MSG = {
-  unique: "Expecting unique value in '%1$s' field",
-  isUUID: "Value for field '%1$s' must be a valid UUIDv%2$s",
-  isEmail: "Value for field '%1$s' must be a valid email address",
-  matches: "Can't find match value on enum field '%1$s'. Expecting '%2$s'",
-  required: "Value for field '%1$s' is required",
-  isLength: "Value for field '%1$s' must have a minimum length of %2$s and maximum length of %3$s characters",
-  minlength: "Value for field '%1$s' must be atleast in %2$s character(s).",
-  maxlength: "Value for field '%1$s' must not exceed in %2$s character(s).",
-}
 
 class WalterBuilder {
   constructor (options) {
@@ -31,11 +21,20 @@ class WalterBuilder {
 
     _.defaults(this.options, {
       uuid: false,
-      uuidVersion: 5
+      uuidVersion: 5,
+      templates: {}
     })
 
     let mongooseSchema = _.get(this.options.model, 'schema.obj')
-    if (_.isNil(mongooseSchema)) throw new Error('A valid mongoose model is required in walter-builder.')
+
+    if (!_.isObject(mongooseSchema)) {
+      throw new Error('A valid mongoose model is required in walter-builder.')
+    }
+
+    Object.assign(
+      this.options.templates,
+      _.omit(defaultTemplate, _.keys(this.options.templates))
+    )
 
     let mapSchema = this.crawl(mongooseSchema)
     this.validationSchema = this.translate(mapSchema)
@@ -133,18 +132,18 @@ class WalterBuilder {
     switch (misc.tag || validationName) {
       case 'required':
         entry.required = {
-          msg: vsprintf(ERR_MSG.required, [absPath])
+          msg: vsprintf(this.options.templates.required, [absPath])
         }; break
 
       case 'unique':
         entry.unique = {
           options: misc.options || [],
-          msg: vsprintf(ERR_MSG.unique, [absPath])
+          msg: vsprintf(this.options.templates.unique, [absPath].concat(misc.options))
         }; break
       
       case 'isEmail':
         entry.isEmail = {
-          msg: vsprintf(ERR_MSG.isEmail, [absPath])
+          msg: vsprintf(this.options.templates.isEmail, [absPath])
         }; break
       
       case 'isUUID':
@@ -154,31 +153,31 @@ class WalterBuilder {
         
         entry.isUUID = {
           options: misc.options || [],
-          msg: vsprintf(ERR_MSG.isUUID, [absPath, misc.options[0] || this.options.uuidVersion])
+          msg: vsprintf(this.options.templates.isUUID, [absPath, misc.options[0] || this.options.uuidVersion])
         }; break
       
       case 'minlength':
         entry.isLength = {
           options: misc.options || [],
-          msg: vsprintf(ERR_MSG[misc.tag], [absPath, misc.minlength])
+          msg: vsprintf(this.options.templates[misc.tag], [absPath, misc.minlength])
         }; break
 
       case 'maxlength':
         entry.isLength = {
           options: misc.options || [],
-          msg: vsprintf(ERR_MSG[misc.tag], [absPath, misc.maxlength])
+          msg: vsprintf(this.options.templates[misc.tag], [absPath, misc.maxlength])
         }; break
       
       case 'isLength':
         entry.isLength = {
           options: misc.options || [],
-          msg: vsprintf(ERR_MSG.isLength, [absPath, misc.minlength, misc.maxlength])
+          msg: vsprintf(this.options.templates.isLength, [absPath, misc.minlength, misc.maxlength])
         }; break
 
       case 'matches':
         entry.matches = {
           options: misc.options || [],
-          msg: vsprintf(ERR_MSG.matches, [absPath, misc.enums])
+          msg: vsprintf(this.options.templates.matches, [absPath, misc.enums])
         }
     }
 
@@ -187,12 +186,13 @@ class WalterBuilder {
 
   translate (mapSchema) {
     let validations = {}
+    let self = this
 
     function __remap (key, schemaEntry) {
       let validation = {}
 
       Object.keys(schemaEntry).forEach(subkey => {
-        if (subkey === 'optional' || ERR_MSG[subkey]) {
+        if (subkey === 'optional' || self.options.templates[subkey]) {
           if (_.isNil(validation[key])) {
             validation[key] = schemaEntry
           } else {

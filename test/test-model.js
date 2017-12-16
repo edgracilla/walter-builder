@@ -11,14 +11,14 @@ module.exports = () => {
         type: String,
         // required: true
       },
-      // email: {
-      //   type: String,
-        // minlength: 10,
-        // maxlength: 50,
-        // required: true,
-        // unique: true,
-      //   index: true
-      // },
+      email: {
+        type: String,
+        minlength: 10,
+        maxlength: 50,
+        required: true,
+        unique: true,
+        index: true
+      },
       // enums: {
       //   type: String,
       //   enum: ['jane', 'jean', 'jhon'],

@@ -8,6 +8,9 @@ let options = {
   uuid: true,
   arrStrict: false,
   model: mongoose.model('TestModel'),
+  templates: {
+    unique: `Expecting unique value in '%1$s' field. %2$s, %3$s`,
+  }
 }
 
 let extraRules = [
@@ -27,12 +30,14 @@ let schema = builder
   // .addRule('arrObj.*.bar', 'unique', ['aa', 'bb'])
   // .unstrict(['arrObj.*', 'schemaObjArr.*'])
 
-  .pickByLoc({query: ['schemaObjArrSchemaObj']}) // !!
+  // .pickByLoc({query: ['schemaObjArrSchemaObj']})
 
   // .select(['_id', 'arrObj.*'])
 
   // .fresh()
   // .addRules(extraRules)
+
+  .select('email')
   .build()
 
 console.log('\n--schema', schema)
